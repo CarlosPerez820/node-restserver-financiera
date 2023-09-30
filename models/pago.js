@@ -49,6 +49,10 @@ const PagoSchema = Schema({
         type: String,
         required: [true, 'La fecha del ultimo pago del prestamo es obligatoria']
     },
+    horaPago: {
+        type: String,
+        required: [true, 'La Hora del ultimo pago del prestamo es obligatoria']
+    },
     gestor: {
         type: String,
         required: [true, 'El gestor asignado es obligatorio']
