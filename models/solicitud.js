@@ -130,6 +130,10 @@ const solicitudSchema = Schema({
         type: String,
         required: [true, 'El gestor es obligatorio']
     },
+    infoCredito:{
+        type: String,
+        required: [true, 'La informacion del credito es es obligatorio']
+    },
     estatus:{
         type: String,
         required: [true, 'El estatus es obligatorio']

@@ -9,7 +9,8 @@ const {
         solicitudPatch,
         solicitudFinancieraGet,
         solicitudValidosGet,
-        solicitudEspecificoGet} = require('../controllers/solicitud');
+        solicitudEspecificoGet,
+        solicitudesDiaGet} = require('../controllers/solicitud');
 
 const { validarCampos } = require('../middlewares/validar-campos');
 const { existeSolicitudID } = require('../helpers/db-validators');
@@ -27,6 +28,8 @@ router.get('/especifico/:id',[
         check('id').custom( existeSolicitudID),
         validarCampos
 ], solicitudEspecificoGet);
+
+router.get('/:financiera/:fech', solicitudesDiaGet);
 
 router.put('/:id',[
         check('id', 'No es un ID valido').isMongoId(),

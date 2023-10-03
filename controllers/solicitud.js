@@ -56,6 +56,25 @@ const solicitudValidosGet = async(req, res= response)=>{
     })
 }
 
+const solicitudesDiaGet = async(req, res= response)=>{
+    const {financiera, fech} = req.params;
+
+    const {limite = 200, desde=0} = req.query;
+    const query = {$and:[{fechaSolicitud: fech},{ sucursal: financiera}]};
+
+    const [total, solicitudes] = await Promise.all([
+        Solicitud.countDocuments(query),
+        Solicitud.find(query)
+        .skip(Number(desde))
+        .limit(Number(limite))
+    ]);
+
+    res.json({
+        total,
+        solicitudes
+    })
+}
+
 const solicitudEspecificoGet = async(req, res= response)=>{
     const {id} = req.params;
     //Validar contra la BD
@@ -116,6 +135,7 @@ module.exports = {
     solicitudGet,
     solicitudFinancieraGet,
     solicitudValidosGet,
+    solicitudesDiaGet,
     solicitudEspecificoGet,
     solicitudPut,
     solicitudPost,
