@@ -37,6 +37,25 @@ const solicitudFinancieraGet = async(req, res= response)=>{
     })
 }
 
+const solicitudTipoFinancieraGet = async(req, res= response)=>{
+    const {financiera,parametro} = req.params;
+
+    const {limite = 300, desde=0} = req.query;
+    const query = {$and:[{estado: true},{ sucursal: financiera},{ tipo: parametro}]};
+
+    const [total, solicitudes] = await Promise.all([
+        Solicitud.countDocuments(query),
+        Solicitud.find(query)
+        .skip(Number(desde))
+        .limit(Number(limite))
+    ]);
+
+    res.json({
+        total,
+        solicitudes
+    })
+}
+
 const solicitudValidosGet = async(req, res= response)=>{
     const {financiera} = req.params;
 
@@ -140,5 +159,6 @@ module.exports = {
     solicitudPut,
     solicitudPost,
     solicitudDelete,
-    solicitudPatch
+    solicitudPatch,
+    solicitudTipoFinancieraGet
 }

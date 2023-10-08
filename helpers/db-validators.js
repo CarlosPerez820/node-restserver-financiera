@@ -126,6 +126,15 @@ const coleccionesPermitidas = (coleccion = '', colecciones=[])=>{
     return true;
 }
 
+const usuarioDisponible = async(usuario)=>{
+
+    const existeUsuario = await Gestor.findOne({usuario});
+    if(existeUsuario)
+    {
+        throw new Error(`El Usuario: ${usuario} No esta disponible`);
+    }
+
+}
 
 module.exports = {
     esRoleValido,
@@ -140,4 +149,5 @@ module.exports = {
     existePrestamoID,
     existeSolicitudID,
     coleccionesPermitidas,
+    usuarioDisponible
 }

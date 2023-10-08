@@ -8,7 +8,8 @@ const {clientesGet,
         clientesPatch,
         clientesFinancieraGet,
         clienteEspecificoGet,
-        buroGet} = require('../controllers/cliente');
+        buroGet,
+        clientesPorNumeroFinancieraGet} = require('../controllers/cliente');
 
 const {validarCampos} = require('../middlewares/validar-campos'); 
 const {numeroClienteDisponible, existeClienteID} = require('../helpers/db-validators');
@@ -26,6 +27,8 @@ router.get('/especifico/:id',[
         check('id').custom( existeClienteID),
         validarCampos
 ], clienteEspecificoGet);
+
+router.get('/numero/:financiera/:parametro', clientesPorNumeroFinancieraGet);
 
 router.put('/:id',[
         check('id', 'No es un ID valido').isMongoId(),

@@ -41,6 +41,25 @@ const seguimientoGestorGet = async (req, res = response) => {
     })
 }
 
+const SeguimientosDiaGet = async(req, res= response)=>{
+    const {financiera, encargado, fech} = req.params;
+
+    const {limite = 200, desde=0} = req.query;
+    const query = {$and:[{gestor: encargado},{fecha: fech},{ sucursal: financiera}]};
+
+    const [total, seguimientos] = await Promise.all([
+        Seguimiento.countDocuments(query),
+        Seguimiento.find(query)
+        .skip(Number(desde))
+        .limit(Number(limite))
+    ]);
+
+    res.json({
+        total,
+        seguimientos
+    })
+}
+
 const seguimientoPost = async(req, res = response) => {
 
     const body = req.body;
@@ -58,5 +77,6 @@ const seguimientoPost = async(req, res = response) => {
 module.exports = {
     seguimientoPost,
     seguimientoFinancieraGet,
-    seguimientoGestorGet
+    seguimientoGestorGet,
+    SeguimientosDiaGet
 }
