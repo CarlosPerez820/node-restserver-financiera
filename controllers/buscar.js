@@ -30,6 +30,26 @@ const buscarClientes  = async(req, res= response)=>{
     })
 }
 
+const buscarClientePorNumero  = async(req, res= response)=>{
+
+     const {termino} = req.params;
+ 
+     const {limite = 15, desde=0} = req.query;
+     const query = {$and:[{estado: true},{ numeroCliente: termino}]};
+ 
+     const [total, clientes] = await Promise.all([
+         Cliente.countDocuments(query),
+         Cliente.find(query)
+         .skip(Number(desde))
+         .limit(Number(limite))
+     ]);
+ 
+     res.json({
+         total,
+         clientes
+     })
+ }
+
 const buscar = (req, res= response) =>{
     const {termino} = req.params;
 
@@ -38,5 +58,6 @@ const buscar = (req, res= response) =>{
 
 module.exports = {
     buscar,
-    buscarClientes
+    buscarClientes,
+    buscarClientePorNumero
 }
