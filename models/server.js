@@ -3,6 +3,7 @@ const cors = require('cors');
 const { dbConnection } = require('../database/config');
 const fileUpload = require('express-fileupload');
 const path = require('path');
+const { automa, automatizaClasificacion } = require('../middlewares/automatiza');
 
 class Server{
 
@@ -29,10 +30,17 @@ class Server{
         this.middlewares();
         //Rutas de aplicacion
         this.routes();
+        //Automatizacion
+        this.automata();
     }
 
     async conectarBD(){
         await dbConnection();
+    }
+
+    automata(){
+        automa();
+        automatizaClasificacion();
     }
 
     middlewares(){
