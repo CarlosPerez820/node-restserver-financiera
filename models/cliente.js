@@ -130,6 +130,10 @@ const ClienteSchema = Schema({
         type: Number,
         required: [true, 'El numero de prestamos es obligatorio']
     },
+    numeroActivos: {
+        type: Number,
+        required: [true, 'El numero de prestamos Activos es obligatorio']
+    },
     prestamosActivos: {
         type: Boolean,
         required: [true, 'Si tiene prestamos activos es obligatorio'],
@@ -142,6 +146,13 @@ const ClienteSchema = Schema({
     sucursal: {
         type: String,
         required: [true, 'La sucursal es obligatorio']
+    },
+    puntuacion: {
+        type: String,
+        default:0
+    },
+    comentarios: {
+        type: String,
     },
     estado: {
         type: Boolean,

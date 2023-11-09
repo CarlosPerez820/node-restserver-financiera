@@ -19,7 +19,7 @@ const formatHour = `${hour}:${minute}`;
 const automa =()=> {
     cron.schedule('00 22 * * *', async () => {
 
-//      console.log('Verificación diaria iniciada:'+formattedDate);
+    console.log('Verificación diaria iniciada:'+formattedDate);
 
     const query = {$and:[{estado: true},{ estatus: 'Activo'},{fechaPago: { $ne: formattedDate }}]};
     const prestamos = await Prestamo.find(query).exec();
@@ -83,7 +83,7 @@ const automa =()=> {
 }
 
 const automatizaClasificacion =()=> {
-  cron.schedule('00 23 * * *', async () => {
+  cron.schedule('00 00 * * *', async () => {
 //    console.log('Verificación diaria de Clasificacion:'+formattedDate)
 
     const query = {$and:[{estado: true},{ prestamosActivos: true}]};

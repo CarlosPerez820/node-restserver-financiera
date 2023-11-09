@@ -61,6 +61,9 @@ const PagoSchema = Schema({
         type: String,
         required: [true, 'El tipo del pago es obligatorio']
     },
+    comentario: {
+        type: String,
+    },
     abono: {
         type: Number,
         required: [true, 'El abono es obligatorio']

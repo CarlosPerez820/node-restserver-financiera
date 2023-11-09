@@ -18,6 +18,14 @@ const GestorSchema = Schema({
         type: String,
         required: [true, 'La Sucursal es obligatoria']
     },
+    efectivo: {
+        type: Number,
+        default:0
+    },
+    desembolso: {
+        type: Number,
+        default: 0
+    },
     estado: {
         type: Boolean,
         default: true
