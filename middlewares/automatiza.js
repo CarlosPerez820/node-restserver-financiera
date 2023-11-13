@@ -1,3 +1,5 @@
+process.env.TZ = 'America/Mexico_City';
+
 const cron = require('node-cron');
 const Prestamo = require('../models/prestamo');
 const Pago = require('../models/pago');
@@ -6,20 +8,21 @@ const Cliente = require('../models/cliente');
 const currentDate = new Date();
 
 const day = currentDate.getDate();
-const month = currentDate.getMonth() + 1; // Los meses en JavaScript van de 0 (enero) a 11 (diciembre), por lo que sumamos 1.
+const month = currentDate.getMonth() + 1; 
 const year = currentDate.getFullYear();
 const hour = currentDate.getHours();
 const minute = currentDate.getMinutes();
 const second = currentDate.getSeconds();
+const milsecond = currentDate.getMilliseconds();
 
 const formattedDate = `${day}/${month}/${year}`;
 const formatHour = `${hour}:${minute}`;
 
 
 const automa =()=> {
-    cron.schedule('00 22 * * *', async () => {
+    cron.schedule('00 22 * * 1-5', async () => {
 
-    console.log('Verificación diaria iniciada:'+formattedDate);
+    console.log('Verificación diaria para Mora iniciada:'+formattedDate + '--'+formatHour);
 
     const query = {$and:[{estado: true},{ estatus: 'Activo'},{fechaPago: { $ne: formattedDate }}]};
     const prestamos = await Prestamo.find(query).exec();
@@ -28,10 +31,10 @@ const automa =()=> {
 
         const recargoPago = new Pago({
             fecha: formattedDate,
-            folio: "MOR-"+year+month+day+minute+second,
+            folio: "MOR-"+year+month+day+minute+second+milsecond,
             nombreCliente: prest.nombre,
             numCliente: prest.numeroCliente,
-            cobranza: 0,
+            cobranza: prest.cobranza,
             cantidadPrestamo:prest.cantidadPrestamo,
             plazo:prest.plazoPrestamo,
             totalPagar:prest.cantidadPagar,
@@ -45,7 +48,6 @@ const automa =()=> {
             abono: prest.cobranza,
             personasCobrador:"Sistema",
             sucursal:prest.sucursal,
-
           });
 
         await recargoPago.save();    
@@ -53,6 +55,7 @@ const automa =()=> {
        try {
         prest.fechaPago = formattedDate;
         prest.totalRestante = prest.totalRestante+prest.cobranza;
+        prest.tipoUltiPago = "Mora";
         await prest.save();      
 
 
@@ -63,10 +66,10 @@ const automa =()=> {
         
 
           // Verificar si la cadena es un número usando isNaN()
-          if (!isNaN(cliente.tipo)) {
-            cliente.tipo =  parseInt(cliente.tipo)+1;
+          if (!isNaN(cliente.puntuacion)) {
+            cliente.puntuacion =  parseInt(cliente.puntuacion)+1;
           } else {
-            cliente.tipo = 1;
+            cliente.puntuacion = 1;
           }
           // Guarda el cambio en la base de datos
           await cliente.save();
@@ -93,15 +96,15 @@ const automatizaClasificacion =()=> {
 
       try {
 
-      if(parseInt(clien.tipo)<8){
+      if(parseInt(clien.tipo)<30){
         clien.clasificacion="A";
         await clien.save();
       }
-      if(parseInt(clien.tipo)>=8 && parseInt(clien.tipo)<15){
+      if(parseInt(clien.tipo)>=30 && parseInt(clien.tipo)<60){
         clien.clasificacion="B";
         await clien.save();
       }
-      if(parseInt(clien.tipo)>=15){
+      if(parseInt(clien.tipo)>=60){
         clien.clasificacion="C";
         await clien.save();
       }
