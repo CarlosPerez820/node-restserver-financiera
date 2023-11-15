@@ -101,9 +101,7 @@ console.log('Verificación diaria para Clasificacion iniciada:'+formattedDate + 
 
       try {
 
-        console.log(clien.nombre);
-        console.log(clien.puntuacion);
-        console.log(clien.clasificacion);
+        console.log(clien.nombre + "+"+clien.puntuacion+"+"+clien.clasificacion);
         console.log("-------");
 
       if(parseInt(clien.puntuacion)<30){
