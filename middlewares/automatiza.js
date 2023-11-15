@@ -29,6 +29,10 @@ const automa =()=> {
 
     for (const prest of prestamos) {
 
+      console.log(prest.nombre);
+      console.log(prest.fechaPago);
+      console.log("-------");
+
         const recargoPago = new Pago({
             fecha: formattedDate,
             folio: "MOR-"+year+month+day+minute+second+milsecond,
@@ -86,8 +90,9 @@ const automa =()=> {
 }
 
 const automatizaClasificacion =()=> {
-  cron.schedule('00 00 * * *', async () => {
+  cron.schedule('30 0 * * *', async () => {
 //    console.log('Verificación diaria de Clasificacion:'+formattedDate)
+console.log('Verificación diaria para Clasificacion iniciada:'+formattedDate + '--'+formatHour);
 
     const query = {$and:[{estado: true},{ prestamosActivos: true}]};
     const clients = await Cliente.find(query).exec();
@@ -96,15 +101,20 @@ const automatizaClasificacion =()=> {
 
       try {
 
-      if(parseInt(clien.tipo)<30){
+        console.log(clien.nombre);
+        console.log(clien.puntuacion);
+        console.log(clien.clasificacion);
+        console.log("-------");
+
+      if(parseInt(clien.puntuacion)<30){
         clien.clasificacion="A";
         await clien.save();
       }
-      if(parseInt(clien.tipo)>=30 && parseInt(clien.tipo)<60){
+      if(parseInt(clien.puntuacion)>=30 && parseInt(clien.puntuacion)<60){
         clien.clasificacion="B";
         await clien.save();
       }
-      if(parseInt(clien.tipo)>=60){
+      if(parseInt(clien.puntuacion)>=60){
         clien.clasificacion="C";
         await clien.save();
       }
