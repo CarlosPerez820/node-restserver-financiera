@@ -5,27 +5,39 @@ const Prestamo = require('../models/prestamo');
 const Pago = require('../models/pago');
 const Cliente = require('../models/cliente');
 
-const currentDate = new Date();
+let day;
+let month; 
+let year;
+let hour;
+let minute;
+let formattedDate;
+let formatHour;
 
-const day = currentDate.getDate();
-const month = currentDate.getMonth() + 1; 
-const year = currentDate.getFullYear();
-const hour = currentDate.getHours();
-const minute = currentDate.getMinutes();
-const second = currentDate.getSeconds();
-const milsecond = currentDate.getMilliseconds();
-
-const formattedDate = `${day}/${month}/${year}`;
-const formatHour = `${hour}:${minute}`;
+const obtencionFecha = () =>{
+  
+  let currentDate = new Date();
+  day = currentDate.getDate();
+  month = currentDate.getMonth() + 1; 
+  year = currentDate.getFullYear();
+  hour = currentDate.getHours();
+  minute = currentDate.getMinutes();
+  formattedDate = `${day}/${month}/${year}`;
+  formatHour = `${hour}:${minute}`;
+}
 
 
 const automa =()=> {
-    cron.schedule('00 22 * * 1-5', async () => {
+    cron.schedule('0 22 * * 1-5', async () => {
+
+    obtencionFecha();
 
     console.log('Verificación diaria para Mora iniciada:'+formattedDate + '--'+formatHour);
+    console.log("Hora Real: "+new Date());
 
     const query = {$and:[{estado: true},{ estatus: 'Activo'},{fechaPago: { $ne: formattedDate }}]};
     const prestamos = await Prestamo.find(query).exec();
+
+    let varDatosFolio;
 
     for (const prest of prestamos) {
 
@@ -33,9 +45,11 @@ const automa =()=> {
       console.log(prest.fechaPago);
       console.log("-------");
 
+      varDatosFolio = new Date();
+
         const recargoPago = new Pago({
             fecha: formattedDate,
-            folio: "MOR-"+year+month+day+minute+second+milsecond,
+            folio: "MOR-"+year+month+day+minute+varDatosFolio.getSeconds()+varDatosFolio.getMilliseconds(),
             nombreCliente: prest.nombre,
             numCliente: prest.numeroCliente,
             cobranza: prest.cobranza,
@@ -82,7 +96,7 @@ const automa =()=> {
         }
         
         } catch (error) {
-          console.error('Error en la actualización:', error);
+          console.error('Error en la actualización del prestamo (Mora):', error);
         }
       }
 
@@ -91,8 +105,6 @@ const automa =()=> {
 
 const automatizaClasificacion =()=> {
   cron.schedule('30 0 * * *', async () => {
-//    console.log('Verificación diaria de Clasificacion:'+formattedDate)
-console.log('Verificación diaria para Clasificacion iniciada:'+formattedDate + '--'+formatHour);
 
     const query = {$and:[{estado: true},{ prestamosActivos: true}]};
     const clients = await Cliente.find(query).exec();
@@ -116,6 +128,9 @@ console.log('Verificación diaria para Clasificacion iniciada:'+formattedDate + 
         clien.clasificacion="C";
         await clien.save();
       }
+
+      console.log('Verificación diaria para Clasificacion Correcta:');
+
     } catch (error) {
       console.error('Error en la clasificacion:', error);
     }
