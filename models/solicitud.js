@@ -138,6 +138,10 @@ const solicitudSchema = Schema({
         type: String,
         require: [true, 'El tipo (nuevo/renovacion)  es obligatorio']
     },
+    tipoPrestamo:{
+        type: String,
+        require: [true, 'El tipo de prestamo (diario/semanal)  es obligatorio']
+    },
     estado: {
         type: Boolean,
         default: true
