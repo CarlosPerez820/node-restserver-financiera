@@ -8,6 +8,10 @@ const ParametroSchema = Schema({
         type: Number,
         required: [true, 'El monto de la mora es obligatoria']
     },
+    MoraSemanal: {
+        type: Number,
+        required: [true, 'El monto de la mora semanal es obligatoria']
+    },
     horaLimite: {
         type: String,
         required: [true, 'La hora limite de los pagos es obligatoria']

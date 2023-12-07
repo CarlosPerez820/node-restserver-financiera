@@ -3,7 +3,8 @@ const {Router} = require('express');
 const {check} = require('express-validator');
 const { seguimientoPost, 
     seguimientoFinancieraGet, 
-    seguimientoGestorGet } = require('../controllers/seguimiento');
+    seguimientoGestorGet, 
+    SeguimientosDiaGet} = require('../controllers/seguimiento');
 
 const { validarCampos } = require('../middlewares/validar-campos');
 
@@ -12,6 +13,8 @@ const router = Router();
 router.get('/:financiera', seguimientoFinancieraGet);
 
 router.get('/:financiera/:encargado', seguimientoGestorGet);
+
+router.get('/:financiera/:encargado/:fech',SeguimientosDiaGet);
 
 router.post('/',[
     check('gestor','El gestor es obligatorio').not().isEmpty(),

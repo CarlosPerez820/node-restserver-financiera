@@ -2,6 +2,8 @@ const express = require('express')
 const cors = require('cors');
 const { dbConnection } = require('../database/config');
 const fileUpload = require('express-fileupload');
+const path = require('path');
+const { automa, automatizaClasificacion, cambioSiguienteFecha } = require('../middlewares/automatiza');
 
 class Server{
 
@@ -28,10 +30,18 @@ class Server{
         this.middlewares();
         //Rutas de aplicacion
         this.routes();
+        //Automatizacion
+        this.automata();
     }
 
     async conectarBD(){
         await dbConnection();
+    }
+
+    automata(){
+        automa();
+        automatizaClasificacion();
+        cambioSiguienteFecha();
     }
 
     middlewares(){
@@ -66,8 +76,16 @@ class Server{
         this.app.use(this.buscarPath, require('../routes/buscar'));
         this.app.use(this.uploads, require('../routes/uploads'));
         this.app.use(this.seguimientosPath, require('../routes/seguimiento'));
+    
+        // Regla de reescritura para Angular (al final)
+        this.app.get('/*', (req, res) => {
+            res.sendFile(path.join(__dirname, '../public/', 'index.html'));
+        });
+    
     }
 
+    
+    
     listen(){
         this.app.listen(this.port, ()=>{
             console.log("Corriendo en el puerto", this.port);

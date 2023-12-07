@@ -10,6 +10,10 @@ const prestamoSchema = Schema({
         required: [true, 'El folio del prestamo es obligatorio'],
         unique: true
     },
+    tipoPrestamo:{
+        type: String,
+        require:[true, 'El tipo de prestamo (diario/semanal) es requerido']
+    },
     nombre: {
         type: String,
         required: [true, 'El nombre es obligatorio']
@@ -54,6 +58,14 @@ const prestamoSchema = Schema({
         type: String,
         required: [true, 'La fecha del ultimo pago es obligatoria']
     },
+    tipoUltiPago: {
+        type: String,
+        required: [true, 'El tipo del ultimo pago es obligatoria']
+    },
+    proximoPago:{
+        type: String,
+        required: [true , 'La fecha del proximo pago es obligatoria']
+    },
     gestor: {
         type: String,
         required: [true, 'El gestor es obligatoria']
@@ -64,7 +76,7 @@ const prestamoSchema = Schema({
     },
     nota: {
         type: String,
-        required: [true, 'El estatus  del prestamo es obligatorio']
+        required: [true, 'La nota  del prestamo es obligatorio']
     },
     numeroCliente: {
         type: String,

@@ -10,6 +10,10 @@ const UsuarioSchema = Schema({
         required: [true, 'El correo es obligatorio'],
         unique: true
     },
+    telefono:{
+        type: String,
+        required: [true, 'El Telefono es obligatorio']
+    },
     password: {
         type: String,
         required: [true, 'La contraseña es obligatoria']
@@ -17,6 +21,10 @@ const UsuarioSchema = Schema({
     rol: {
         type: String,
         required: [true, 'El Rol es obligatorio']
+    },
+    membresia: {
+        type: String,
+        required: [true, 'La membresia es obligatoria']
     },
     sucursal: {
         type: String,

@@ -5,6 +5,10 @@ const InteresSchema = Schema({
         type: String,
         required: [true, 'La Sucursal es obligatoria']
     },
+    tipo: {
+        type: String,
+        required:[true, 'El tipo de interes (mensual/diario) es obligatorio']
+    },
     limiteInferior:{
         type: Number,
         required: [true, 'El limite inferior es obligatorio']

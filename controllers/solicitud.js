@@ -37,11 +37,49 @@ const solicitudFinancieraGet = async(req, res= response)=>{
     })
 }
 
+const solicitudTipoFinancieraGet = async(req, res= response)=>{
+    const {financiera,parametro} = req.params;
+
+    const {limite = 300, desde=0} = req.query;
+    const query = {$and:[{estado: true},{ sucursal: financiera},{ tipo: parametro}]};
+
+    const [total, solicitudes] = await Promise.all([
+        Solicitud.countDocuments(query),
+        Solicitud.find(query)
+        .skip(Number(desde))
+        .limit(Number(limite))
+    ]);
+
+    res.json({
+        total,
+        solicitudes
+    })
+}
+
 const solicitudValidosGet = async(req, res= response)=>{
     const {financiera} = req.params;
 
     const {limite = 300, desde=0} = req.query;
     const query = {$and:[{estado: true},{ sucursal: financiera},{estatus:'Pendiente'}]};
+
+    const [total, solicitudes] = await Promise.all([
+        Solicitud.countDocuments(query),
+        Solicitud.find(query)
+        .skip(Number(desde))
+        .limit(Number(limite))
+    ]);
+
+    res.json({
+        total,
+        solicitudes
+    })
+}
+
+const solicitudesDiaGet = async(req, res= response)=>{
+    const {financiera, fech} = req.params;
+
+    const {limite = 200, desde=0} = req.query;
+    const query = {$and:[{fechaSolicitud: fech},{ sucursal: financiera}]};
 
     const [total, solicitudes] = await Promise.all([
         Solicitud.countDocuments(query),
@@ -116,9 +154,11 @@ module.exports = {
     solicitudGet,
     solicitudFinancieraGet,
     solicitudValidosGet,
+    solicitudesDiaGet,
     solicitudEspecificoGet,
     solicitudPut,
     solicitudPost,
     solicitudDelete,
-    solicitudPatch
+    solicitudPatch,
+    solicitudTipoFinancieraGet
 }

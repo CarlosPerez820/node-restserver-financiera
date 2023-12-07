@@ -6,8 +6,8 @@ const buroGet = async(req, res = response) => {
 
     const {financiera} = req.params;
 
-    const {limite = 200, desde=0} = req.query;
-    const query = {$and:[{estado: true},{ clasificacion: 'C'}]};
+    const {limite = 1000, desde=0} = req.query;
+    const query = {$and:[{estado: true},{ clasificacion: { $in: ['C', 'B'] }} ]};
 
     const [total, clientes] = await Promise.all([
         Cliente.countDocuments(query),
@@ -44,6 +44,25 @@ const clientesFinancieraGet = async(req, res= response)=>{
 
     const {limite = 200, desde=0} = req.query;
     const query = {$and:[{estado: true},{ sucursal: financiera}]};
+
+    const [total, clientes] = await Promise.all([
+        Cliente.countDocuments(query),
+        Cliente.find(query)
+        .skip(Number(desde))
+        .limit(Number(limite))
+    ]);
+
+    res.json({
+        total,
+        clientes
+    })
+}
+
+const clientesPorNumeroFinancieraGet = async(req, res= response)=>{
+    const {financiera, parametro} = req.params;
+
+    const {limite = 5, desde=0} = req.query;
+    const query = {$and:[{estado: true},{ sucursal: financiera},{ numeroCliente: parametro}]};
 
     const [total, clientes] = await Promise.all([
         Cliente.countDocuments(query),
@@ -123,5 +142,6 @@ module.exports = {
     clientesPut,
     clientesPost,
     clientesDelete,
-    clientesPatch
+    clientesPatch,
+    clientesPorNumeroFinancieraGet
 }

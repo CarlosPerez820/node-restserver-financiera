@@ -10,7 +10,7 @@ const {gestoresGet,
         gestorEspecificoGet} = require('../controllers/gestor')
 
 const { validarCampos } = require('../middlewares/validar-campos');
-const { existeGestorID } = require('../helpers/db-validators');
+const { existeGestorID, usuarioDisponible } = require('../helpers/db-validators');
 
 const router = Router();
 
@@ -33,6 +33,7 @@ router.put('/:id',[
 router.post('/',[
     check('nombre','El nombre es obligatorio').not().isEmpty(),
     check('usuario','El usuario es obligatorio').not().isEmpty(),
+    check('usuario').custom(usuarioDisponible),
     check('sucursal','La sucursal es obligatorio').not().isEmpty(),
     check('password','La contraseña debe tener mas 6 caracteres').isLength({min:6}),
     validarCampos
