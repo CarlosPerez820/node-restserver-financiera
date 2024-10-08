@@ -23,96 +23,97 @@ const cargarArchivo = async (req, res=response) => {
     }  
 }
 
-actualizarImagen = async (req, res=response)=>{
-    const {id, coleccion, ruta, subruta, nombre, opcion} = req.params;
+const actualizarImagen = async (req, res) => {
+    try {
+        const { id, coleccion, ruta, subruta, nombre, opcion } = req.params;
 
-    let modelo;
+        let modelo;
 
-    switch (coleccion) {
-        case 'parametros':
-            modelo = await Parametro.findById(id);
-            if(!modelo){
-                return res.status(400).json({
-                    msg: 'No existe parametro con ese id'
-                });
-            }
-            else{
-                const rutaURL = await subirArchivo(req.files,ruta,subruta,nombre);
-                modelo.urlLogo = rutaURL;
+        switch (coleccion) {
+            case 'parametros':
+                modelo = await Parametro.findById(id);
+                if (!modelo) {
+                    return res.status(400).json({
+                        msg: 'No existe parámetro con ese id'
+                    });
+                } else {
+                    const rutaURL = await subirArchivo(req.files, ruta, subruta, nombre);
+                    modelo.urlLogo = rutaURL;
 
-                await modelo.save();
-            }
-            break;
-
-        case 'clientes':
-            modelo = await Cliente.findById(id);
-            if(!modelo){
-                return res.status(400).json({
-                    msg: 'No existe cliente con ese id'
-                });
-            }
-            else{
-                const rutaURL = await subirArchivo(req.files,ruta,subruta,nombre);
-                switch (opcion) {
-                    case 'comprobante':
-                        modelo.fotoComprobante = rutaURL;
-                        await modelo.save();
-                        break;
-                    case 'frente':
-                        modelo.fotoIneFrente = rutaURL;
-                        await modelo.save();
-                        break;        
-                    case 'reverso':
-                        modelo.fotoIneReverso = rutaURL;
-                        await modelo.save();
-                        break;        
-                    default:
-                        return res.status(400).json({
-                            msg: 'No existe esta opcion'
-                        });
-                        break;
+                    await modelo.save();
                 }
-            }
-            break;
+                break;
 
-        case 'prestamos':
-            modelo = await Prestamo.findById(id);
-            if(!modelo){
-                return res.status(400).json({
-                    msg: 'No existe prestamo con ese id'
-                });
-            }
-            else{
-                const rutaURL = await subirArchivo(req.files,ruta,subruta,nombre);
-                switch (opcion) {
-                    case 'dinero':
-                        modelo.urlDinero = rutaURL;
-                        await modelo.save();
-                        break;
-                    case 'pagare':
-                        modelo.urlPagare = rutaURL;
-                        await modelo.save();
-                        break;        
-                    case 'fachada':
-                        modelo.urlFachada = rutaURL;
-                        await modelo.save();
-                        break;        
-                    default:
-                        return res.status(400).json({
-                            msg: 'No existe esta opcion'
-                        });
-                        break;
+            case 'clientes':
+                modelo = await Cliente.findById(id);
+                if (!modelo) {
+                    return res.status(400).json({
+                        msg: 'No existe cliente con ese id'
+                    });
+                } else {
+                    const rutaURL = await subirArchivo(req.files, ruta, subruta, nombre);
+                    switch (opcion) {
+                        case 'perfil':
+                            modelo.fotoPerfil = rutaURL;
+                            break;
+                        case 'comprobante':
+                            modelo.fotoComprobante = rutaURL;
+                            break;
+                        case 'fachada':
+                            modelo.fotoFachada = rutaURL;
+                            break;
+                        case 'frente':
+                            modelo.fotoIneFrente = rutaURL;
+                            break;
+                        case 'reverso':
+                            modelo.fotoIneReverso = rutaURL;
+                            break;
+                        default:
+                            return res.status(400).json({
+                                msg: 'No existe esta opción'
+                            });
+                    }
+                    await modelo.save();
                 }
-            }
-            break;
+                break;
 
-        default:
-            return res.status(500).json({msg: 'Validacion faltante'});
-            break;
+            case 'prestamos':
+                modelo = await Prestamo.findById(id);
+                if (!modelo) {
+                    return res.status(400).json({
+                        msg: 'No existe préstamo con ese id'
+                    });
+                } else {
+                    const rutaURL = await subirArchivo(req.files, ruta, subruta, nombre);
+                    switch (opcion) {
+                        case 'dinero':
+                            modelo.urlDinero = rutaURL;
+                            break;
+                        case 'pagare':
+                            modelo.urlPagare = rutaURL;
+                            break;
+                        case 'fachada':
+                            modelo.urlFachada = rutaURL;
+                            break;
+                        default:
+                            return res.status(400).json({
+                                msg: 'No existe esta opción'
+                            });
+                    }
+                    await modelo.save();
+                }
+                break;
+
+            default:
+                return res.status(500).json({ msg: 'Validación faltante' });
+        }
+
+        res.json(modelo);
+    } catch (error) {
+        console.error('Error al actualizar la imagen:', error);
+        res.status(500).json({ msg: 'Error interno del servidor' });
     }
-
-    res.json(modelo);
-}
+};
 
 module.exports={
     cargarArchivo,

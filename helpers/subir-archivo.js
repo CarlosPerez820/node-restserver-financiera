@@ -30,8 +30,6 @@ const subirArchivo = (files, carpeta='', subcarpeta='', nombre='')=>{
         resolve(rutaImagen);
         });    
     });
-
-    
 }
 
 module.exports = {

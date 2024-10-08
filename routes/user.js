@@ -8,7 +8,7 @@ const { usuariosGet,
         usuariosPatch } = require('../controllers/user');
 
 const { validarCampos } = require('../middlewares/validar-campos');
-const { esRoleValido, correoDisponible, existeUsuarioID } = require('../helpers/db-validators');
+const { esRoleValido, correoDisponible, existeUsuarioID, sucursalDisponible } = require('../helpers/db-validators');
 
 const router = Router();
 
@@ -23,6 +23,7 @@ router.put('/:id',[
 router.post('/',[
     check('nombre','El nombre es obligatorio').not().isEmpty(),
     check('sucursal','La sucursal es obligatoria').not().isEmpty(),
+    check('sucursal').custom(sucursalDisponible),
     check('correo','Correo no valido').isEmail(),
     check('correo').custom(correoDisponible),
     check('password','La contraseña debe tener mas 6 caracteres').isLength({min:6}),

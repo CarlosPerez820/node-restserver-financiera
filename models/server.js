@@ -17,6 +17,8 @@ class Server{
         this.gestoresPath = '/api/gestores';
         this.interesPath = '/api/interes';
         this.pagosPath = '/api/pagos';
+        this.gastosPath = '/api/gastos';
+        this.dotacionPath = '/api/dotacion';
         this.parametrosPath = '/api/parametros';
         this.prestamosPath = '/api/prestamos';
         this.solitudesPath = '/api/solicitudes';
@@ -70,6 +72,8 @@ class Server{
         this.app.use(this.gestoresPath, require('../routes/gestor'));
         this.app.use(this.interesPath, require('../routes/interes'));
         this.app.use(this.pagosPath, require('../routes/pago'));
+        this.app.use(this.dotacionPath, require('../routes/dotacion'));
+        this.app.use(this.gastosPath, require('../routes/gastos'));
         this.app.use(this.parametrosPath, require('../routes/parametro'));
         this.app.use(this.prestamosPath, require('../routes/prestamo'));
         this.app.use(this.solitudesPath, require('../routes/solicitud'));

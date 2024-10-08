@@ -7,6 +7,8 @@ const Pago = require('../models/pago');
 const Parametro = require('../models/parametro');
 const Prestamo = require('../models/prestamo');
 const Solicitud = require('../models/solicitud');
+const Gasto = require('../models/gasto');
+const Dotacion = require('../models/dotacion');
 
 
 const esRoleValido = async(rol = '') =>{
@@ -23,6 +25,15 @@ const correoDisponible = async(correo)=>{
     if(existeEmail)
     {
         throw new Error(`El correo: ${correo} ya existe en la base de datos`);
+    }
+}
+
+const sucursalDisponible = async(sucursal)=>{
+
+    const existeSucursal = await Usuario.findOne({sucursal});
+    if(existeSucursal)
+    {
+        throw new Error(`La sucursal: ${sucursal} ya existe en la base de datos`);
     }
 
 }
@@ -87,6 +98,26 @@ const existePagoID = async(id)=>{
     }
 }
 
+const existeGastoID = async(id)=>{
+    
+    const existeGasto = await Gasto.findById(id);
+       
+    if(!existeGasto)
+    {   
+        throw new Error(`El ID: ${id} no existe en la base de datos`);
+    }
+}
+
+const existeDotacionID = async(id)=>{
+    
+    const existeDotacion = await Dotacion.findById(id);
+       
+    if(!existeDotacion)
+    {   
+        throw new Error(`El ID: ${id} no existe en la base de datos`);
+    }
+}
+
 const existeParametroID = async(id)=>{
     
     const existeParametro = await Parametro.findById(id);
@@ -140,6 +171,7 @@ module.exports = {
     esRoleValido,
     correoDisponible,
     existeUsuarioID,
+    sucursalDisponible,
     numeroClienteDisponible,
     existeClienteID,
     existeGestorID,
@@ -147,6 +179,8 @@ module.exports = {
     existePagoID,
     existeParametroID,
     existePrestamoID,
+    existeGastoID,
+    existeDotacionID,
     existeSolicitudID,
     coleccionesPermitidas,
     usuarioDisponible

@@ -109,6 +109,9 @@ const ClienteSchema = Schema({
     fotoComprobante: {
         type: String
     },
+    fotoPerfil: {
+        type: String
+    },
     fotoFachada: {
         type: String
     },

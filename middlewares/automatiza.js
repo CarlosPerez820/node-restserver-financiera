@@ -43,76 +43,96 @@ const calcularProximoPago=()=>{
 }
 
 //Funcion de automatizar la asignacion de las moras y la edicion del prestamo   
-const automa =()=> {
-    cron.schedule('0 22 * * 1-5', async () => {
-    
-    console.log("Asignacion de moras");
-    obtencionFecha();
+const automa = () => {
+  // Cron job para préstamos de tipo "Tradicional" (Lunes a Viernes)
+  cron.schedule('0 22 * * 1-5', async () => {
+    console.log("Asignacion de moras para préstamos Tradicionales");
+    await asignarMoras('tradicional');
+  });
 
-    //Obtenemos la lista de los prestamos que no se han registrados en el dia actual
-    const query = {$and:[{estado: true},{ estatus: 'Activo'},{fechaPago: { $ne: formattedDate }}]};
-    const prestamos = await Prestamo.find(query).exec();
+  // Cron job para préstamos de tipo "Blindaje" (Lunes a Sábado)
+  cron.schedule('0 22 * * 1-6', async () => {
+    console.log("Asignacion de moras para préstamos Blindaje");
+    await asignarMoras('blindaje');
+  });
+};
 
-    let varDatosFolio;
+// Función común para asignar moras según el tipo de préstamo
+const asignarMoras = async (tipoPrestamo) => {
+  obtencionFecha(); // Obtener y formatear la fecha actual
 
-    for (const prest of prestamos) {
-      //Se filtran por una condicion los prestamos semanales 
-      if(prest.tipoPrestamo=='Diario' || (prest.tipoPrestamo=='Semanal' && prest.fechaPago!=prest.proximoPago && prest.proximoPago==formattedDate))
-      {
-        varDatosFolio = new Date();
+  // Obtenemos la lista de los préstamos que no se han registrado en el día actual
+  const query = {
+    $and: [
+      { estado: true },
+      { estatus: 'Activo' },
+      { fechaPago: { $ne: formattedDate } },
+      { tipoPrestamo: tipoPrestamo } // Filtra por tipo de préstamo ("Tradicional" o "Blindaje")
+    ]
+  };
+  
+  const prestamos = await Prestamo.find(query).exec();
 
-          const recargoPago = new Pago({
-              fecha: formattedDate,
-              folio: "MOR-"+year+month+day+minute+varDatosFolio.getSeconds()+varDatosFolio.getMilliseconds(),
-              nombreCliente: prest.nombre,
-              numCliente: prest.numeroCliente,
-              cobranza: prest.cobranza,
-              cantidadPrestamo:prest.cantidadPrestamo,
-              plazo:prest.plazoPrestamo,
-              totalPagar:prest.cantidadPagar,
-              totalRestante:prest.totalRestante+prest.cobranza,
-              pagoDiario:prest.pagoDiario,
-              folioPrestamo:prest.folio,
-              fechaPago:formattedDate,
-              horaPago:formatHour,
-              gestor:prest.gestor,
-              tipo:"Mora",
-              abono: prest.cobranza,
-              personasCobrador:"Sistema",
-              sucursal:prest.sucursal,
-            });
-            //Se registra la mora
-          await recargoPago.save();    
+  let varDatosFolio;
 
-        try {
-          prest.fechaPago = formattedDate;
-          prest.totalRestante = prest.totalRestante+prest.cobranza;
-          prest.tipoUltiPago = "Mora";
-          await prest.save();      
-          //Se actualiza la informacion del prestamo
+  for (const prest of prestamos) {
+    // El filtro se realiza solo por el tipo de préstamo
+    if (prest.tipoPrestamo === 'tradicional' || prest.tipoPrestamo === 'blindaje') {
+      varDatosFolio = new Date();
 
-          //Se optienen los clientes
-          const clienteEspecifico = await Cliente.find({numeroCliente: prest.numeroCliente}).exec();
-          if (clienteEspecifico.length > 0) {
-            const cliente = clienteEspecifico[0]; 
-          
-            //Se actualiza la informacion del cliente
-            if (!isNaN(cliente.puntuacion)) {
-              cliente.puntuacion =  parseInt(cliente.puntuacion)+1;
-            } else {
-              cliente.puntuacion = 1;
-            }
-            await cliente.save();
-          }else{
-            //console.log("No hay cliente");
+      const recargoPago = new Pago({
+        fecha: formattedDate,
+        folio: "MOR-" + year + month + day + minute + varDatosFolio.getSeconds() + varDatosFolio.getMilliseconds(),
+        nombreCliente: prest.nombre,
+        numCliente: prest.numeroCliente,
+        cobranza: prest.cobranza,
+        cantidadPrestamo: prest.cantidadPrestamo,
+        plazo: prest.plazoPrestamo,
+        totalPagar: prest.cantidadPagar,
+        totalRestante: prest.totalRestante + prest.cobranza,
+        pagoDiario: prest.pagoDiario,
+        folioPrestamo: prest.folio,
+        fechaPago: formattedDate,
+        horaPago: formatHour,
+        gestor: prest.gestor,
+        tipo: "Mora",
+        abono: prest.cobranza,
+        personasCobrador: "Sistema",
+        sucursal: prest.sucursal,
+      });
+
+      // Se registra la mora
+      await recargoPago.save();
+
+      try {
+        // Actualización del préstamo
+        prest.fechaPago = formattedDate;
+        prest.totalRestante = prest.totalRestante + prest.cobranza;
+        prest.tipoUltiPago = "Mora";
+        await prest.save();
+
+        // Se obtienen los clientes
+        const clienteEspecifico = await Cliente.find({ numeroCliente: prest.numeroCliente }).exec();
+        if (clienteEspecifico.length > 0) {
+          const cliente = clienteEspecifico[0];
+
+          // Actualización de la información del cliente
+          if (!isNaN(cliente.puntuacion)) {
+            cliente.puntuacion = parseInt(cliente.puntuacion) + 1;
+          } else {
+            cliente.puntuacion = 1;
           }
-          } catch (error) {
-            console.error('Error en la actualización del prestamo (Mora):', error);
-          } 
-        } 
+          await cliente.save();
+        } else {
+          // console.log("No hay cliente");
+        }
+      } catch (error) {
+        console.error('Error en la actualización del préstamo (Mora):', error);
       }
-    });
-}
+    }
+  }
+};
+
 
 //Funcion correspondiente al cambio de fecha proxima para los prestamos semanales
 const cambioSiguienteFecha=()=>{
